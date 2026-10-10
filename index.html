@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scorely | Ugong Pasig National High School</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f3f5fa;
+    color: #202b46;
+}
+
+body.logged-out .sidebar,
+body.logged-out main {
+    display: none;
+}
+
+body.logged-in .login-screen {
+    display: none;
+}
+
+body.logged-out .login-screen {
+    display: flex;
+}
+
+button {
+    border: 0;
+    border-radius: 7px;
+    padding: 10px 13px;
+    background: #326be5;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+input, select {
+    padding: 11px;
+    border: 1px solid #dce2ee;
+    border-radius: 7px;
+    width: 100%;
+    margin: 7px 0 14px;
+    background: white;
+}
+
+label {
+    font-size: 13px;
+    font-weight: bold;
+    display: block;
+}
+
+.notice {
+    font-size: 13px;
+    color: #16804a;
+    margin-top: 12px;
+}
+
+.muted {
+    color: #78839a;
+    font-size: 14px;
+    margin-top: 7px;
+}
+
+.secondary {
+    background: #e8efff;
+    color: #326be5;
+}
+
+.danger {
+    background: #ffeded;
+    color: #c33b3b;
+}
+
+.actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    display: inline-block;
+    background: #e8f0ff;
+    color: #326be5;
+    padding: 6px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.item {
+    padding: 14px 0;
+    border-bottom: 1px solid #edf0f6;
+}
+
+.item:last-child {
+    border: 0;
+}
+
+.item p {
+    color: #78839a;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.panel, .card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #17294b08;
+}
+
+h3 {
+    margin-bottom: 17px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 540px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 9px;
+    border-bottom: 1px solid #edf0f6;
+    font-size: 13px;
+}
+
+th {
+    color: #78839a;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Login */
+.login-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #f3f5fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    width: 400px;
+    max-width: 100%;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px #101a3515;
+}
+
+.login-logo {
+    font-size: 34px;
+    font-weight: bold;
+    color: #326be5;
+    margin-bottom: 12px;
+}
+
+.login-card h2 {
+    margin: 24px 0 9px;
+}
+
+.login-card p {
+    color: #78839a;
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.login-card button {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.login-error {
+    color: #c33b3b !important;
+    font-size: 13px;
+    margin-top: 14px;
+}
+
+/* Sidebar and dashboard */
+.sidebar {
+    position: fixed;
+    width: 225px;
+    height: 100vh;
+    background: #101a35;
+    color: white;
+    padding: 25px 16px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #69a8ff;
+    margin-bottom: 30px;
+}
+
+.profile {
+    line-height: 1.8;
+    margin-bottom: 28px;
+}
+
+.profile small {
+    color: #aab5cf;
+}
+
+nav button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: #c1cbe0;
+    margin: 5px 0;
+}
+
+nav button.active,
+nav button:hover {
+    background: #263d70;
+    color: white;
+}
+
+main {
+    margin-left: 225px;
+    padding: 28px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+header p {
+    color: #78839a;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.card p {
+    color: #78839a;
+    margin-bottom: 12px;
+}
+
+.card h2 {
+    font-size: 27px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #101a3580;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 500;
+}
+
+.modal-box {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    width: 430px;
+    max-width: 100%;
+}
+
+.modal-box h3 {
+    margin-bottom: 20px;
+}
+
+.close {
+    float: right;
+    background: #e8efff;
+    color: #326be5;
+}
+
+.search {
+    max-width: 350px;
+}
+
+@media(max-width:1000px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:650px) {
+    .sidebar {
+        width: 67px;
+        padding: 18px 7px;
+    }
+
+    .logo {
+        font-size: 17px;
+    }
+
+    .profile, .nav-text {
+        display: none;
+    }
+
+    nav button {
+        text-align: center;
+        padding: 12px 4px;
+        font-size: 12px;
+    }
+
+    main {
+        margin-left: 67px;
+        padding: 14px;
+    }
+
+    header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .stats {
+        gap: 8px;
+    }
+
+    .card, .panel {
+        padding: 14px;
+    }
+
+    .card h2 {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body class="logged-out">
+
+<div class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+        <div class="login-logo">Scorely.</div>
+        <p>Ugong Pasig National High School</p>
+        <h2>Welcome Back!</h2>
+        <p>Sign in to manage your student records and grades.</p>
+
+        <label for="loginUsername">Username</label>
+        <input id="loginUsername" required placeholder="Enter username">
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" required placeholder="Enter password">
+
+        <button type="submit">Login</button>
+        <p id="loginError" class="login-error"></p>
+    </form>
+</div>
+
+<aside class="sidebar">
+    <div class="logo">Scorely.</div>
+
+    <div class="profile">
+        <strong id="profileName">Jamila DelaCruz</strong><br>
+        <small>Teacher Dashboard</small>
+    </div>
+
+    <nav>
+        <button data-page="dashboard" class="active" onclick="page('dashboard',this)">▦ <span class="nav-text">Dashboard</span></button>
+        <button data-page="classes" onclick="page('classes',this)">▣ <span class="nav-text">My Classes</span></button>
+        <button data-page="grades" onclick="page('grades',this)">▤ <span class="nav-text">Grade Records</span></button>
+        <button data-page="students" onclick="page('students',this)">♙ <span class="nav-text">Students</span></button>
+        <button data-page="settings" onclick="page('settings',this)">⚙ <span class="nav-text">Settings</span></button>
+        <button onclick="logout()">↪ <span class="nav-text">Log Out</span></button>
+    </nav>
+</aside>
+
+<main>
+    <header>
+        <div>
+            <h1 id="pageTitle">Dashboard</h1>
+            <p>Ugong Pasig National High School</p>
+        </div>
+        <button onclick="openForm()">+ Add Student</button>
+    </header>
+
+    <section id="dashboard" class="page active">
+        <div class="stats">
+            <div class="card"><p>Total Students</p><h2 id="totalStudents">0</h2></div>
+            <div class="card"><p>My Classes</p><h2 id="totalClasses">0</h2></div>
+            <div class="card"><p>Grades Recorded</p><h2 id="recorded">0</h2></div>
+            <div class="card"><p>Pending Grades</p><h2 id="pending">0</h2></div>
+        </div>
+
+        <div class="grid">
+            <div class="panel"><h3>My Classes</h3><div id="dashClasses"></div></div>
+            <div class="panel"><h3>Recent Activity</h3><div id="activities"></div></div>
+        </div>
+
+        <div class="panel">
+            <h3>Quick Actions</h3>
+            <div class="actions">
+                <button onclick="page('students')">Manage Students</button>
+                <button class="secondary" onclick="page('grades')">Enter Grades</button>
+                <button class="secondary" onclick="page('classes')">View Classes</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="students" class="page">
+        <div class="panel">
+            <h3>Student Records</h3>
+            <input class="search" id="search" placeholder="Search by student name, ID, or class..." oninput="renderStudents()">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Student ID</th><th>Name</th><th>Class</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="studentRows"></tbody>
+                </table>
+            </div>
+            <p id="studentMessage" class="notice"></p>
+        </div>
+    </section>
+
+    <section id="classes" class="page">
+        <div class="panel">
+            <h3>My Classes</h3>
+            <div id="classList"></div>
+        </div>
+    </section>
+
+    <section id="grades" class="page">
+        <div class="panel">
+            <h3>Grade Records</h3>
+            <p class="muted">Select a student and quarter to add or update a grade.</p><br>
+
+            <label>Student</label>
+            <select id="gradeStudent"></select>
+
+            <label>Quarter</label>
+            <select id="quarter">
+                <option value="first">First Quarter</option>
+                <option value="second">Second Quarter</option>
+                <option value="third">Third Quarter</option>
+                <option value="fourth">Fourth Quarter</option>
+            </select>
+
+            <label>Grade (0–100)</label>
+            <input id="gradeValue" type="number" min="0" max="100" placeholder="Enter grade">
+            <button onclick="saveGrade()">Save Grade</button>
+            <p id="gradeMessage" class="notice"></p>
+        </div>
+
+        <div class="panel">
+            <h3>Recorded Grades</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Student</th><th>Class</th><th>Quarter</th><th>Grade</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="gradeRows"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="settings" class="page">
+        <div class="panel">
+            <h3>School Information</h3>
+            <label>System</label>
+            <input value="Scorely" readonly>
+
+            <label>School Name</label>
+            <input value="Ugong Pasig National High School" readonly>
+
+            <label>Teacher Name</label>
+            <input id="teacherName" value="Jamila DelaCruz">
+
+            <button onclick="saveSettings()">Save Teacher Name</button>
+            <p id="settingsMessage" class="notice"></p>
+        </div>
+
+        <div class="panel">
+            <h3>JSON Data Backup</h3>
+            <p class="muted">Export your records to a JSON file or import a previous backup.</p><br>
+            <button onclick="exportJSON()">Export JSON</button>
+
+            <label style="margin-top:20px">Import JSON backup</label>
+            <input id="importFile" type="file" accept=".json,application/json">
+            <button class="secondary" onclick="importJSON()">Import JSON</button>
+            <p id="dataMessage" class="notice"></p>
+        </div>
+    </section>
+</main>
+
+<div class="modal" id="studentModal">
+    <div class="modal-box">
+        <button class="close" onclick="closeForm()">Close</button>
+        <h3 id="formTitle">Add Student</h3>
+
+        <form id="studentForm">
+            <input type="hidden" id="editingId">
+
+            <label>Student ID</label>
+            <input id="studentId" required placeholder="e.g. 2026-001">
+
+            <label>Student Name</label>
+            <input id="studentName" required placeholder="Full name">
+
+            <label>Class / Section</label>
+            <select id="studentClass"></select>
+
+            <button type="submit">Save Student</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Demo login: username teacher, password scorely123
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    if (username === "teacher" && password === "scorely123") {
+        document.body.classList.remove("logged-out");
+        document.body.classList.add("logged-in");
+        document.getElementById("loginError").textContent = "";
+    } else {
+        document.getElementById("loginError").textContent = "Invalid username or password.";
+    }
+});
+
+function logout() {
+    document.body.classList.remove("logged-in");
+    document.body.classList.add("logged-out");
+    document.getElementById("loginForm").reset();
+    document.getElementById("loginError").textContent = "";
+}
+
+const school = "Ugong Pasig National High School";
+
+const classes = [
+    {id: 1, name: "Grade 10 - Section A", subject: "Mathematics"},
+    {id: 2, name: "Grade 10 - Section B", subject: "Mathematics"},
+    {id: 3, name: "Grade 11 - Section A", subject: "Statistics"}
+];
+
+let students = [
+    {id: "2026-001", name: "Alexis Demonteverde", classId: 1, grades: {first: 90, second: 92, third: null, fourth: null}},
+    {id: "2026-002", name: "Allen Jovellanos", classId: 2, grades: {first: 85, second: 88, third: null, fourth: null}},
+    {id: "2026-003", name: "Liya Ornedo", classId: 3, grades: {first: 94, second: 91, third: null, fourth: null}},
+    {id: "2026-004", name: "Kenzo Arellano", classId: 1, grades: {first: 89, second: null, third: null, fourth: null}}
+];
+
+let activities = ["Scorely system initialized"];
+
+const quarters = {
+    first: "First Quarter",
+    second: "Second Quarter",
+    third: "Third Quarter",
+    fourth: "Fourth Quarter"
+};
+
+function setActiveNav(pageId) {
+    document.querySelectorAll("nav button[data-page]").forEach(button => {
+        button.classList.toggle("active", button.dataset.page === pageId);
+    });
+}
+
+function page(id, button) {
+    document.querySelectorAll(".page").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.getElementById("pageTitle").textContent =
+        id === "dashboard" ? "Dashboard" :
+        id === "classes" ? "My Classes" :
+        id === "grades" ? "Grade Records" :
+        id === "students" ? "Students" : "Settings";
+
+    if (button) {
+        document.querySelectorAll("nav button[data-page]").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+    } else {
+        setActiveNav(id);
+    }
+
+    renderAll();
+}
+
+function className(id) {
+    return classes.find(c => c.id === Number(id))?.name || "Unassigned";
+}
+
+function addActivity(text) {
+    activities.unshift(text);
+    activities = activities.slice(0, 8);
+    renderActivities();
+}
+
+function renderClasses() {
+    const html = classes.map(c => {
+        const count = students.filter(s => s.classId === c.id).length;
+
+        return `<div class="item">
+            <strong>${esc(c.name)}</strong>
+            <p>${esc(c.subject)} · ${count} students</p><br>
+            <button class="secondary" onclick="viewClass(${c.id})">View Students</button>
+        </div>`;
+    }).join("") || "No classes available.";
+
+    document.getElementById("classList").innerHTML = html;
+    document.getElementById("dashClasses").innerHTML = html;
+}
+
+function viewClass(id) {
+    page("students");
+    document.getElementById("search").value = className(id);
+    renderStudents();
+}
+
+function renderStudents() {
+    const query = (document.getElementById("search")?.value || "").toLowerCase();
+
+    const list = students.filter(s =>
+        s.name.toLowerCase().includes(query) ||
+        s.id.toLowerCase().includes(query) ||
+        className(s.classId).toLowerCase().includes(query)
+    );
+
+    document.getElementById("studentRows").innerHTML = list.map(s => `
+        <tr>
+            <td>${esc(s.id)}</td>
+            <td>${esc(s.name)}</td>
+            <td>${esc(className(s.classId))}</td>
+            <td>
+                <div class="actions">
+                    <button onclick="editStudent('${escJS(s.id)}')">Edit</button>
+                    <button class="danger" onclick="deleteStudent('${escJS(s.id)}')">Delete</button>
+                </div>
+            </td>
+        </tr>
+    `).join("") || `<tr><td colspan="4">No students found.</td></tr>`;
+}
+
+function renderOptions() {
+    const selected = document.getElementById("gradeStudent").value;
+
+    document.getElementById("gradeStudent").innerHTML = students.map(s =>
+        `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.id)})</option>`
+    ).join("");
+
+    if (students.some(s => s.id === selected)) {
+        document.getElementById("gradeStudent").value = selected;
+    }
+
+    const old = document.getElementById("studentClass").value;
+
+    document.getElementById("studentClass").innerHTML = classes.map(c =>
+        `<option value="${c.id}">${esc(c.name)}</option>`
+    ).join("");
+
+    if (classes.some(c => String(c.id) === old)) {
+        document.getElementById("studentClass").value = old;
+    }
+}
+
+function renderGrades() {
+    let rows = [];
+
+    students.forEach(s => Object.entries(s.grades).forEach(([q, g]) => {
+        if (g !== null && g !== "" && g !== undefined) {
+            rows.push({s, q, g});
+        }
+    }));
+
+    document.getElementById("gradeRows").innerHTML = rows.map(r => `
+        <tr>
+            <td>${esc(r.s.name)}</td>
+            <td>${esc(className(r.s.classId))}</td>
+            <td>${quarters[r.q]}</td>
+            <td>${r.g}</td>
+            <td><button class="secondary" onclick="editGrade('${escJS(r.s.id)}','${r.q}')">Edit</button></td>
+        </tr>
+    `).join("") || `<tr><td colspan="5">No grades recorded yet.</td></tr>`;
+
+    document.getElementById("recorded").textContent = rows.length;
+    document.getElementById("pending").textContent = Math.max(0, students.length * 4 - rows.length);
+}
+
+function renderActivities() {
+    document.getElementById("activities").innerHTML = activities.map(a =>
+        `<div class="item">${esc(a)}</div>`
+    ).join("");
+}
+
+function renderAll() {
+    document.getElementById("totalStudents").textContent = students.length;
+    document.getElementById("totalClasses").textContent = classes.length;
+
+    renderClasses();
+    renderStudents();
+    renderOptions();
+    renderGrades();
+    renderActivities();
+}
+
+function openForm() {
+    document.getElementById("studentForm").reset();
+    document.getElementById("editingId").value = "";
+    document.getElementById("formTitle").textContent = "Add Student";
+
+    renderOptions();
+    document.getElementById("studentModal").style.display = "flex";
+}
+
+function closeForm() {
+    document.getElementById("studentModal").style.display = "none";
+}
+
+function editStudent(id) {
+    const s = students.find(x => x.id === id);
+    if (!s) return;
+
+    document.getElementById("studentForm").reset();
+    document.getElementById("editingId").value = s.id;
+    document.getElementById("studentId").value = s.id;
+    document.getElementById("studentName").value = s.name;
+
+    renderOptions();
+    document.getElementById("studentClass").value = s.classId;
+    document.getElementById("formTitle").textContent = "Edit Student";
+    document.getElementById("studentModal").style.display = "flex";
+}
+
+document.getElementById("studentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const oldId = document.getElementById("editingId").value;
+    const id = document.getElementById("studentId").value.trim();
+    const name = document.getElementById("studentName").value.trim();
+    const classId = Number(document.getElementById("studentClass").value);
+
+    if (students.some(s => s.id === id && s.id !== oldId)) {
+        alert("That student ID already exists.");
+        return;
+    }
+
+    if (oldId) {
+        const s = students.find(x => x.id === oldId);
+        if (!s) return;
+
+        s.id = id;
+        s.name = name;
+        s.classId = classId;
+        addActivity("Updated student: " + name);
+    } else {
+        students.push({
+            id,
+            name,
+            classId,
+            grades: {first: null, second: null, third: null, fourth: null}
+        });
+
+        addActivity("Added student: " + name);
+    }
+
+    closeForm();
+    renderAll();
+});
+
+function deleteStudent(id) {
+    const s = students.find(x => x.id === id);
+
+    if (!s || !confirm("Delete " + s.name + " and their grade records?")) return;
+
+    students = students.filter(x => x.id !== id);
+    addActivity("Deleted student: " + s.name);
+    renderAll();
+}
+
+function saveGrade() {
+    const id = document.getElementById("gradeStudent").value;
+    const q = document.getElementById("quarter").value;
+    const input = document.getElementById("gradeValue");
+    const value = input.value;
+    const s = students.find(x => x.id === id);
+
+    if (!s) {
+        document.getElementById("gradeMessage").textContent = "Add a student first.";
+        return;
+    }
+
+    if (value === "" || Number(value) < 0 || Number(value) > 100) {
+        document.getElementById("gradeMessage").textContent = "Enter a grade from 0 to 100.";
+        return;
+    }
+
+    s.grades[q] = Number(value);
+    document.getElementById("gradeMessage").textContent = "Grade saved successfully.";
+
+    addActivity("Updated " + quarters[q] + " grade for " + s.name);
+    renderAll();
+}
+
+function editGrade(id, q) {
+    page("grades");
+
+    document.getElementById("gradeStudent").value = id;
+    document.getElementById("quarter").value = q;
+
+    const s = students.find(x => x.id === id);
+    document.getElementById("gradeValue").value = s?.grades[q] ?? "";
+
+    document.getElementById("gradeMessage").textContent = "Update the grade, then click Save Grade.";
+}
+
+function saveSettings() {
+    const name = document.getElementById("teacherName").value.trim();
+    if (!name) return;
+
+    document.getElementById("profileName").textContent = name;
+    document.getElementById("settingsMessage").textContent = "Teacher name updated.";
+
+    addActivity("Teacher information updated");
+}
+
+function exportJSON() {
+    const data = {
+        school,
+        teacher: document.getElementById("teacherName").value,
+        classes,
+        students,
+        activities
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "scorely_data.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+    document.getElementById("dataMessage").textContent = "JSON backup exported.";
+}
+
+function importJSON() {
+    const file = document.getElementById("importFile").files[0];
+
+    if (!file) {
+        document.getElementById("dataMessage").textContent = "Choose a JSON file first.";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+        try {
+            const data = JSON.parse(reader.result);
+
+            if (!Array.isArray(data.students) ||
+                !Array.isArray(data.classes) ||
+                !data.students.every(s =>
+                    s.id !== undefined &&
+                    typeof s.name === "string" &&
+                    s.grades
+                )) {
+                throw new Error("Invalid file");
+            }
+
+            students = data.students;
+            classes.splice(0, classes.length, ...data.classes);
+
+            if (Array.isArray(data.activities)) activities = data.activities;
+            if (data.teacher) {
+                document.getElementById("teacherName").value = data.teacher;
+            }
+
+            document.getElementById("profileName").textContent =
+                document.getElementById("teacherName").value;
+
+            renderAll();
+            document.getElementById("dataMessage").textContent = "JSON imported successfully.";
+        } catch (error) {
+            document.getElementById("dataMessage").textContent = "Invalid Scorely JSON backup.";
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+function esc(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[c]));
+}
+
+function escJS(value) {
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/[\r\n]/g, "");
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
